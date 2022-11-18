@@ -1,10 +1,31 @@
 import Dep from "./dep";
 
-function isPureObject(target) {
-  return {}.toString.call(target).includes("Object");
+const isType = (name) => {
+  const [firstLetter] = name;
+  name = firstLetter.toUpperCase() + name.toLowerCase().slice(1);
+  return (target) => ({}.toString.call(target).includes(name));
+};
+
+const isPureObject = isType("object");
+
+export default class Observer {
+  constructor(data) {
+    this.walk(data);
+  }
+  walk(data) {
+    for (const key in data) {
+      if (Object.hasOwnProperty.call(data, key)) {
+        const value = object[key];
+        defineProperty(data, key, value);
+      }
+    }
+  }
 }
 
 function defineProperty(obj, key, value) {
+  if (isPureObject(value)) {
+    new Observer();
+  }
   const dep = new Dep();
   Object.defineProperty(obj, key, {
     configurable: true,
@@ -20,21 +41,4 @@ function defineProperty(obj, key, value) {
       }
     },
   });
-}
-
-export default class Observer {
-  constructor(data) {
-    this.walk(data);
-  }
-  walk(data) {
-    if (isPureObject(data)) {
-      for (const key in data) {
-        if (Object.hasOwnProperty.call(data, key)) {
-          const value = object[key];
-          defineProperty(data, key, value);
-          new Observer(value);
-        }
-      }
-    }
-  }
 }
